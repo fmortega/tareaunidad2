@@ -61,7 +61,7 @@ public class Alquilar extends javax.swing.JPanel {
 
                 preciofinal = vehiculo.calculaPrecio(dias);
                 break;
-            case "Camion":
+            case "Camion":  
                 vehiculo = new Camion(matricula, tipo, dias);
                 vehiculo.setTipoVehiculo("Camion");
 
@@ -76,13 +76,14 @@ public class Alquilar extends javax.swing.JPanel {
         vehiculo.setDias(dias);
         vehiculo.setMatricula(matricula);
         Object[] fila = new Object[4];
+       try{
         fila[0] = vehiculo.getTipoVehiculo();
 
         fila[1] = vehiculo.getMatricula();
 
         fila[2] = vehiculo.getDias();
 
-        fila[3] = preciofinal;
+        fila[7] = preciofinal;
         model.addRow(fila);
 
         DefaultTableCellRenderer modelocentrar = new DefaultTableCellRenderer();
@@ -95,6 +96,9 @@ public class Alquilar extends javax.swing.JPanel {
 
         limpiar();
         btnGuardar.setEnabled(false);
+       }catch(Exception e){
+       JOptionPane.showMessageDialog(null, "Error "+e.getMessage());
+       }
     }
 
     public void habilitarComponentes() {
@@ -104,6 +108,7 @@ public class Alquilar extends javax.swing.JPanel {
         txtvehiculo2.setEnabled(true);
         txtprecio2.setEnabled(true);
         btnModificar.setEnabled(true);
+        btnBorrar.setEnabled(true);
     }
 
     public void desabilitarCompenentes() {
@@ -113,6 +118,7 @@ public class Alquilar extends javax.swing.JPanel {
         txtvehiculo2.setEnabled(false);
         txtprecio2.setEnabled(false);
         btnModificar.setEnabled(false);
+        btnBorrar.setEnabled(false);
     }
 
     @SuppressWarnings("unchecked")
@@ -134,6 +140,7 @@ public class Alquilar extends javax.swing.JPanel {
         txtprecio2 = new javax.swing.JTextField();
         txtdias2 = new javax.swing.JTextField();
         btnModificar = new javax.swing.JButton();
+        btnBorrar = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tablaReporte = new javax.swing.JTable();
 
@@ -191,6 +198,14 @@ public class Alquilar extends javax.swing.JPanel {
             }
         });
 
+        btnBorrar.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        btnBorrar.setText("X");
+        btnBorrar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBorrarActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -208,9 +223,11 @@ public class Alquilar extends javax.swing.JPanel {
                         .addComponent(txtdias2, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(txtprecio2, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(38, 38, 38)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnBorrar, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(lblerror, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addGap(0, 220, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -254,8 +271,9 @@ public class Alquilar extends javax.swing.JPanel {
                         .addComponent(txtmatricula2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(txtvehiculo2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(txtdias2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(txtprecio2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(txtprecio2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnBorrar, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(26, 26, 26)
                 .addComponent(btnModificar)
                 .addContainerGap(58, Short.MAX_VALUE))
         );
@@ -373,22 +391,21 @@ public class Alquilar extends javax.swing.JPanel {
         String valores = "";
         if (evt.getClickCount() == 2) {
             int fila = tablaReporte.getSelectedRow();
-            int numFilas = tablaReporte.getRowCount();
-            habilitarComponentes();
-            for (int i = 0; i < numFilas; i++) {
-                if (fila != -1) {
-                    String vehiculo = (String) model.getValueAt(i, 0);
-                    String matricula = (String) model.getValueAt(i, 1);
-                    Integer dias = (Integer) model.getValueAt(i, 2);
-                    double precio = (double) model.getValueAt(i, 3);
-                    txtvehiculo2.setText(vehiculo);
-                    txtmatricula2.setText(matricula);
-                    txtdias2.setText("" + dias);
-                    txtprecio2.setText("" + precio);
 
-                } else {
-                    JOptionPane.showInternalMessageDialog(null, "Seleccione fila");
-                }
+            habilitarComponentes();
+
+            if (fila != -1) {
+                String vehiculo = (String) model.getValueAt(fila, 0);
+                String matricula = (String) model.getValueAt(fila, 1);
+                Integer dias = (Integer) model.getValueAt(fila, 2);
+                double precio = (double) model.getValueAt(fila, 3);
+                txtvehiculo2.setText(vehiculo);
+                txtmatricula2.setText(matricula);
+                txtdias2.setText("" + dias);
+                txtprecio2.setText("" + precio);
+
+            } else {
+                JOptionPane.showInternalMessageDialog(null, "Seleccione fila");
             }
 
         }
@@ -397,20 +414,19 @@ public class Alquilar extends javax.swing.JPanel {
     private void btnModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificarActionPerformed
 
         int fila = tablaReporte.getSelectedRow();
-        int numFilas = tablaReporte.getRowCount();
+
         habilitarComponentes();
         try {
-            for (int i = 0; i < numFilas; i++) {
-                if (fila != -1) {
-                    if (tablaReporte.isRowSelected(i)) {
-                        model.setValueAt(txtvehiculo2.getText(), i, 0);
-                        model.setValueAt(txtmatricula2.getText(), i, 1);
-                        model.setValueAt(txtdias2.getText(), i, 2);
-                        model.setValueAt(txtprecio2.getText(), i, 3);
-                    }
 
-                }
+            if (fila != -1) {
+
+                model.setValueAt(txtvehiculo2.getText(), fila, 0);
+                model.setValueAt(txtmatricula2.getText(), fila, 1);
+                model.setValueAt((Integer.parseInt(txtdias2.getText())), fila, 2);
+                model.setValueAt((Double.parseDouble(txtprecio2.getText())), fila, 3);
+
             }
+
             txtvehiculo2.setText("");
             txtmatricula2.setText("");
             txtdias2.setText("");
@@ -423,8 +439,16 @@ public class Alquilar extends javax.swing.JPanel {
 
     }//GEN-LAST:event_btnModificarActionPerformed
 
+    private void btnBorrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBorrarActionPerformed
+        txtvehiculo2.setText("");
+        txtmatricula2.setText("");
+        txtdias2.setText("");
+        txtprecio2.setText("");
+    }//GEN-LAST:event_btnBorrarActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnBorrar;
     private javax.swing.JButton btnGuardar;
     private javax.swing.JButton btnModificar;
     private javax.swing.JComboBox<String> combo;
